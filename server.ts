@@ -47,7 +47,6 @@ interface Database {
 }
 
 // Default Seed Database (Bcrypt hashed default password is 'admin' or '123456')
-// Hash for 'admin': $2a$10$UoWbXit1D5n1A4C4LWehpeOQ5fD9E46gUvG31H6b/v50e0Z25XkGe
 const DEFAULT_DB: Database = {
   vendors: [
     { 
@@ -103,12 +102,10 @@ function getDatabase(): Database {
       const content = fs.readFileSync(DB_FILE, "utf-8");
       const db = JSON.parse(content);
       
-      // Upgrade existing database if missing any password hashes
       let modified = false;
       if (db.vendors) {
         db.vendors.forEach((v: any) => {
           if (!v.passwordHash) {
-            // Automatically assign default password "admin" to old profiles so they don't break
             v.passwordHash = "$2a$10$UoWbXit1D5n1A4C4LWehpeOQ5fD9E46gUvG31H6b/v50e0Z25XkGe";
             modified = true;
           }
@@ -136,22 +133,20 @@ function saveDatabase(db: Database) {
 async function startServer() {
   const app = express();
   
-  // Maximize payload limit to allow smooth Base64 brand logos & product images
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   // Serve static assets from the public directory (for manifest.json and icons)
   app.use(express.static("public"));
 
-  // API: Get all vendors (for routing/validation helper in frontend)
+  // API: Get all vendors
   app.get("/api/vendors", (req, res) => {
     const db = getDatabase();
-    // Return safe data without hashes
     const safeVendors = db.vendors.map(({ passwordHash, ...rest }) => rest);
     res.json(safeVendors);
   });
 
-  // API: Get single vendor detail (For checkout pages - does not require authentication)
+  // API: Get single vendor detail
   app.get("/api/vendors/:slug", (req, res) => {
     const db = getDatabase();
     const vendor = db.vendors.find(v => v.slug === req.params.slug.toLowerCase());
@@ -164,7 +159,7 @@ async function startServer() {
     res.json({ vendor: safeVendor, products, orders });
   });
 
-  // API: Secure Owner Password Authentication / Login Verification
+  // API: Login Verification
   app.post("/api/vendors/:slug/login", async (req, res) => {
     const { password } = req.body;
     const { slug } = req.params;
@@ -178,7 +173,6 @@ async function startServer() {
       return res.status(404).json({ error: "Store not found" });
     }
 
-    // Default legacy support in case hashing failed
     const storedHash = vendor.passwordHash || "$2a$10$UoWbXit1D5n1A4C4LWehpeOQ5fD9E46gUvG31H6b/v50e0Z25XkGe";
 
     try {
@@ -186,8 +180,6 @@ async function startServer() {
       if (!match) {
         return res.status(401).json({ error: "Invalid secure storefront credentials." });
       }
-      
-      // Successful login - return a simple mock token session flag
       res.json({ success: true, token: `LNK_SESSION_${vendor.id}_${Date.now()}` });
     } catch (err) {
       console.error(err);
@@ -195,7 +187,7 @@ async function startServer() {
     }
   });
 
-  // API: Set/Reset password (used to initialize passwords for legacy storefronts)
+  // API: Set/Reset password
   app.post("/api/vendors/:slug/set-password", async (req, res) => {
     const { password } = req.body;
     const { slug } = req.params;
@@ -251,14 +243,13 @@ async function startServer() {
 
       db.vendors.push(newVendor);
 
-      // Seed a starter service pack product for the new storefront
       const newProdId = db.products.length > 0 ? Math.max(...db.products.map(p => p.id)) + 1 : 1;
       db.products.push({
         id: newProdId,
         vendorId: newVendorId,
         name: "Standard Booking Service",
         price: 99,
-        image: "" // Empty starter image
+        image: ""
       });
 
       saveDatabase(db);
@@ -269,7 +260,7 @@ async function startServer() {
     }
   });
 
-  // API: Handle Order Submission & Dynamic Split Payment calculations
+  // API: Handle Order Submission
   app.post("/api/checkout", (req, res) => {
     const { vendorId, customerName, customerEmail, customerPhone, productId, quantity, reference } = req.body;
     
@@ -286,14 +277,8 @@ async function startServer() {
     }
 
     const totalAmount = product.price * parseInt(quantity);
-    
-    // Dynamic universal processing fee is 1.95%
     const paymentGatewayFee = totalAmount * 0.0195;
-    
-    // Platform maintenance split is 3.00%
     const platformCut = totalAmount * 0.03;
-    
-    // Merchant earnings is remaining balance
     const vendorEarnings = totalAmount - paymentGatewayFee - platformCut;
 
     vendor.balance += vendorEarnings;
@@ -316,10 +301,10 @@ async function startServer() {
     db.orders.push(newOrder);
     saveDatabase(db);
 
-    res.json({ success: true, message: "Order processed and international split payout cleared successfully!", order: newOrder });
+    res.json({ success: true, message: "Order processed clean!", order: newOrder });
   });
 
-  // API: Add a new product/offering with optional picture
+  // API: Add a new product
   app.post("/api/products/add", (req, res) => {
     const { vendorId, productName, productPrice, image } = req.body;
     if (!vendorId || !productName || !productPrice) {
@@ -338,7 +323,7 @@ async function startServer() {
       vendorId: vendor.id,
       name: productName,
       price: parseFloat(productPrice),
-      image: image || "" // Save Base64 binary safely
+      image: image || ""
     };
 
     db.products.push(newProduct);
@@ -347,7 +332,7 @@ async function startServer() {
     res.json({ success: true, product: newProduct });
   });
 
-  // API: Update Merchant profile details (Brand Logo, Phone number, Business Name)
+  // API: Update Merchant profile
   app.post("/api/vendors/:slug/update", (req, res) => {
     const { businessName, phone, logo } = req.body;
     const db = getDatabase();
@@ -359,13 +344,13 @@ async function startServer() {
 
     if (businessName) vendor.businessName = businessName;
     if (phone) vendor.phone = phone;
-    if (logo !== undefined) vendor.logo = logo; // Can overwrite or clear logo
+    if (logo !== undefined) vendor.logo = logo;
 
     saveDatabase(db);
     res.json({ success: true, message: "Profile settings updated successfully!", vendor });
   });
 
-  // API: Simulate vendor balance payout withdrawal
+  // API: Simulate withdrawal
   app.post("/api/vendors/:slug/withdraw", (req, res) => {
     const db = getDatabase();
     const vendor = db.vendors.find(v => v.slug === req.params.slug.toLowerCase());
@@ -377,10 +362,10 @@ async function startServer() {
     vendor.balance = 0;
     saveDatabase(db);
 
-    res.json({ success: true, message: `Successfully initiated a payout of $${withdrawnAmount.toFixed(2)} to your registered international bank account!` });
+    res.json({ success: true, message: `Successfully initiated a payout of $${withdrawnAmount.toFixed(2)}` });
   });
 
-  // Vite Integration
+  // Vite Integration & Production Client Asset Handlers
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -389,7 +374,14 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
+    
     app.use(express.static(distPath));
+
+    // Fix: Intercept explicit requests for the PWA service worker background compilation assets
+    app.get(["/sw.js", "/registerSW.js"], (req, res) => {
+      res.sendFile(path.resolve(distPath, req.path.substring(1)));
+    });
+
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
@@ -403,3 +395,4 @@ async function startServer() {
 }
 
 startServer();
+
