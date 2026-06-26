@@ -385,6 +385,56 @@ async function startServer() {
     res.json({ success: true, message: `Successfully initiated a payout of $${withdrawnAmount.toFixed(2)} to your registered international bank account!` });
   });
 
+  // Dedicated manifest and sw.js routes with explicit content types & CORS
+  app.get("/manifest.json", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const manifestPath = isProd
+      ? path.join(process.cwd(), "dist", "manifest.json")
+      : path.join(process.cwd(), "public", "manifest.json");
+
+    res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.sendFile(manifestPath);
+  });
+
+  app.get("/sw.js", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const swPath = isProd
+      ? path.join(process.cwd(), "dist", "sw.js")
+      : path.join(process.cwd(), "public", "sw.js");
+
+    res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.sendFile(swPath);
+  });
+
+  // Dedicated routes for PWA icons to ensure CORS and instant delivery
+  app.get("/icon-192.png", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const iconPath = isProd
+      ? path.join(process.cwd(), "dist", "icon-192.png")
+      : path.join(process.cwd(), "public", "icon-192.png");
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.sendFile(iconPath);
+  });
+
+  app.get("/icon-512.png", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const iconPath = isProd
+      ? path.join(process.cwd(), "dist", "icon-512.png")
+      : path.join(process.cwd(), "public", "icon-512.png");
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.sendFile(iconPath);
+  });
+
   // Vite Integration
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
