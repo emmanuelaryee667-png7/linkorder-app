@@ -3,11 +3,134 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>LinkOrder — Instantly Showcase & Get Paid</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#10b981" />
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+    <style>
+      /* Splash/Loading Screen Styles */
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #0f172a;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        overflow: hidden;
+      }
+      #splash-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: #0f172a;
+        color: #ffffff;
+        transition: opacity 0.5s ease-out;
+      }
+      .logo-pulse {
+        animation: pulse 2s infinite ease-in-out;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.25));
+      }
+      .app-title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin: 0;
+        background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeIn 1s ease-out forwards;
+      }
+      .app-subtitle {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #10b981;
+        margin-top: 6px;
+        animation: fadeIn 1.2s ease-out forwards;
+      }
+      .loading-bar {
+        width: 100px;
+        height: 3px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        margin-top: 24px;
+        overflow: hidden;
+        position: relative;
+      }
+      .loading-progress {
+        width: 40%;
+        height: 100%;
+        background-color: #10b981;
+        border-radius: 4px;
+        position: absolute;
+        animation: slide 1.5s infinite ease-in-out;
+      }
+      @keyframes pulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 0.9;
+        }
+        50% {
+          transform: scale(1.08);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slide {
+        0% {
+          left: -40%;
+        }
+        50% {
+          left: 100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Splash Screen displayed instantly before JS bundle finishes loading -->
+      <div id="splash-container">
+        <!-- Beautiful Cart Logo matching landing page colors -->
+        <svg class="logo-pulse" width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="21" r="1.5" fill="#10b981" />
+          <circle cx="19" cy="21" r="1.5" fill="#10b981" />
+          <path d="M2.00012 2H4.40012L7.52012 14.48C7.63012 14.92 8.03012 15.23 8.49012 15.23H18.1401C18.5901 15.23 18.9801 14.93 19.1001 14.5L21.8001 5.23H5.21012" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <h1 class="app-title">LinkOrder</h1>
+        <p class="app-subtitle">Direct Checkout & Instant Split Payouts</p>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register Service Worker for offline capabilities
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>
 
