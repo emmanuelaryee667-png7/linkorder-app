@@ -1,8 +1,7 @@
-const CACHE_NAME = "linkorder-v4";
+const CACHE_NAME = "linkorder-v5";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
-  "/manifest.json",
   "/icon-512.png",
   "/icon-192.png",
   "/icon-512.jpg"
@@ -41,8 +40,13 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Bypass API calls, websockets, and dev-server assets from caching
-  if (url.pathname.startsWith("/api") || url.pathname.includes("/socket.io") || url.pathname.includes("@vite")) {
+  // Bypass API calls, manifest, websockets, and dev-server assets from caching
+  if (
+    url.pathname.startsWith("/api") || 
+    url.pathname.includes("manifest.json") || 
+    url.pathname.includes("/socket.io") || 
+    url.pathname.includes("@vite")
+  ) {
     return;
   }
 
