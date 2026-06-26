@@ -1,0 +1,6 @@
+{
+  "name": "LinkOrder",
+  "description": "SaaS order and payment platform for Ghana. Create custom payment links, accept Mobile Money or Cards, and track revenue with integrated commission splitting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

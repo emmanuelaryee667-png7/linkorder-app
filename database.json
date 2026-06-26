@@ -1,0 +1,59 @@
+{
+  "vendors": [
+    {
+      "id": 1,
+      "slug": "creative-studio",
+      "businessName": "Creative Design Studio",
+      "balance": 1450,
+      "phone": "+233 24 123 4567",
+      "passwordHash": "$2a$10$UoWbXit1D5n1A4C4LWehpeOQ5fD9E46gUvG31H6b/v50e0Z25XkGe",
+      "logo": ""
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "vendorId": 1,
+      "name": "Premium Branding Campaign",
+      "price": 450,
+      "image": ""
+    },
+    {
+      "id": 2,
+      "vendorId": 1,
+      "name": "Custom Social Design Assets",
+      "price": 120,
+      "image": ""
+    }
+  ],
+  "orders": [
+    {
+      "id": 1,
+      "vendorId": 1,
+      "customerName": "Kofi Mensah",
+      "customerEmail": "kofi.mensah@gmail.com",
+      "customerPhone": "+233 20 987 6543",
+      "productName": "Premium Branding Campaign",
+      "quantity": 1,
+      "totalPaid": 450,
+      "paystackFeePaid": 8.78,
+      "commissionPaid": 13.5,
+      "paymentReference": "LNK_GLB_928172",
+      "date": "6/26/2026, 1:33:07 AM"
+    },
+    {
+      "id": 2,
+      "vendorId": 1,
+      "customerName": "Ama Serwaa",
+      "customerEmail": "ama.serwaa@example.com",
+      "customerPhone": "+233 24 555 1234",
+      "productName": "Custom Social Design Assets",
+      "quantity": 2,
+      "totalPaid": 240,
+      "paystackFeePaid": 4.68,
+      "commissionPaid": 7.2,
+      "paymentReference": "LNK_GLB_819283",
+      "date": "6/25/2026, 10:33:07 PM"
+    }
+  ]
+}
