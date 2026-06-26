@@ -1,4 +1,4 @@
-const CACHE_NAME = "linkorder-v2";
+const CACHE_NAME = "linkorder-v3";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
