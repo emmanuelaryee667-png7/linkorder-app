@@ -8,3 +8,6 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
+
+// Lift the scroll lock once the React app mounts and is ready
+document.body.classList.remove('loading');
