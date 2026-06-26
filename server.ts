@@ -140,6 +140,9 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+  // Serve static assets from the public directory (for manifest.json and icons)
+  app.use(express.static("public"));
+
   // API: Get all vendors (for routing/validation helper in frontend)
   app.get("/api/vendors", (req, res) => {
     const db = getDatabase();
