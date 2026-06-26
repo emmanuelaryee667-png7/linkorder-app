@@ -1,0 +1,10 @@
+{
+  "name": "LinkOrder",
+  "short_name": "LinkOrder",
+  "id": "com.linkorder.app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0072ff",
+  "description": "LinkOrder empowers local business owners to easily create custom ordering links. Share your link directly on WhatsApp, Instagram, or social media, allowing your clients to place orders seamlessly and process local payments effortlessly."
+}
