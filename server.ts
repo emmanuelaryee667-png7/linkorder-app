@@ -375,13 +375,17 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     
-    app.use(express.static(distPath));
-
-    // Fix: Intercept explicit requests for the PWA service worker background compilation assets
+    // 1. Intercept Service Worker requests FIRST with explicit headers to stop the lag
     app.get(["/sw.js", "/registerSW.js"], (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Content-Type", "application/javascript");
       res.sendFile(path.resolve(distPath, req.path.substring(1)));
     });
 
+    // 2. Serve general static directories second
+    app.use(express.static(distPath));
+
+    // 3. Fallback catch-all route handles browser client hydration loops last
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
@@ -395,4 +399,4 @@ async function startServer() {
 }
 
 startServer();
-
+ 
