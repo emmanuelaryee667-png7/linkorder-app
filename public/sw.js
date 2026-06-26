@@ -1,9 +1,10 @@
-const CACHE_NAME = "linkorder-v1";
+const CACHE_NAME = "linkorder-v2";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/icon-512.jpg"
+  "/icon-512.png",
+  "/icon-192.png"
 ];
 
 // Install Event - cache core static resources
